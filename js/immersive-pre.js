@@ -812,15 +812,18 @@ function updateAvatars() {
     for (let id in window.avatars) {
         if (id == window.playerid) continue;
         let avatar = window.avatars[id];
-        if (
-            avatar.headset.position.x ||
-            avatar.headset.position.y ||
-            avatar.headset.position.z
-        ) {
+        // if (
+        //     avatar.headset.position.x ||
+        //     avatar.headset.position.y ||
+        //     avatar.headset.position.z
+        // )
+         {
+            
             // not in the default pos
             avatar.headset.model.matrix = avatar.headset.matrix;
             avatar.leftController.model.matrix = avatar.leftController.matrix;
             avatar.rightController.model.matrix = avatar.rightController.matrix;
+            // console.log(id, avatar.headset.position)
         }
     }
 }
