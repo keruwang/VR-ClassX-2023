@@ -3559,6 +3559,30 @@ const _animateNoop = () => {};
 
 let wasInteractMode = true;
 
+function NodeToJson(node) {
+   let jsonObj = {
+      bevel: node._bevel,
+      blend: node._blend,
+      blur: node._blur,
+      opacity: node._opacity,
+      color: node._color,
+      dull: node._dull,
+      info: node._info,
+      melt: node._melt,
+      parent: NodeToJson(node._parent),
+      precision: node._precision,
+      flags: node._flags,
+      customShader: node._customShader,
+      matrix: node.getMatrix(),
+   } 
+   console.log(jsonObj)
+   return jsonObj;
+}
+
+function NodeFromJson(jsonObj) {
+
+}
+
 function Node(_form) {
    let id = uniqueID(),
        m = new Matrix(),
@@ -3661,6 +3685,7 @@ function Node(_form) {
       child._precision = null;
       child._flags  = null;
       child._customShader = null;
+      let childJson = NodeToJson(child);
       return child;
    }
    this.remove = arg => { // ARG CAN BE EITHER AN INDEX OR A CHILD NODE
