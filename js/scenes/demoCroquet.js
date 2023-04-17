@@ -7,9 +7,7 @@ export let initModel = () => {
 
 export let updateModel = e => {
     croquetModel.scene = [Math.random(), Math.random(), Math.random()];
-    console.log("update model")
     console.log(croquetModel.scene)
-    // window.color = croquetModel.scene;
 }
 
 export let drawAvatar = actor => {
@@ -35,7 +33,6 @@ export const init = async model => {
     croquet.register('croquetDemo_1.0');
     let cube = model.add('cube');
     model.move(0,1.5,0).scale(.3).animate(() => {
-        // console.log(croquetModel.scene)
-       cube.identity().scale(.5).color(...croquetModel.scene);
+       if(croquetModel) cube.identity().scale(.5).color(...croquetModel.scene);
     });
  }
