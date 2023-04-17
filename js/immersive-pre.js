@@ -91,6 +91,8 @@ window.teamObj = {};
 window.teamAvatar = {};
 window.team = "team1";
 
+window.color = [1,1,1];
+
 import * as mtt from "../js/util/mtt/mtt.js"
 mtt.init();
 

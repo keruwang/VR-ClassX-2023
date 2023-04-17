@@ -1,7 +1,7 @@
 
 // YOUR APPLICATION SHOULD REDEFINE THESE FUNCTIONS:
 
-import {drawCursor, drawView, initModel, updateModel} from "../scenes/demoCroquet.js";
+import {drawAvatar, drawView, initModel, updateModel} from "../scenes/demoCroquet.js";
 import { controllerMatrix,  buttonState, joyStickState} from "../render/core/controllerInput.js";
 import { initAvatar } from "../primitive/avatar.js";
 
@@ -40,10 +40,12 @@ export class Model extends Croquet.Model {
       this.publish("actor", "exit", actor);
    }
    initScene() {
+    console.log("init scene")
       window.croquetModel = this;
       initModel();
    }
    updateScene(e) {
+    console.log("update scene")
       if (window.croquetModel)
          updateModel(e);
    }
@@ -148,7 +150,7 @@ export class View extends Croquet.View {
    event(state, pos) { this.updateScene({who : this.viewId,
                                          what : state,
                                          where : pos}); }
-   mouseDown(p) { this.isDown = true ; this.event('press', p); }
+   mouseDown(p) { this.isDown = true ; console.log("mouse down"); this.event('press', p); }
    mouseMove(p) { this.event(this.isDown ? 'drag' : 'move', p); }
    mouseUp(p)   { this.isDown = false; this.event('release', p); }
 }
@@ -159,7 +161,7 @@ export class Pawn extends Croquet.View {
       this.actor = actor;
    }
    update(viewState) {
-      drawCursor(this.actor);
+      drawAvatar(this.actor);
    }
 }
 
