@@ -47,7 +47,11 @@ export class Model extends Croquet.Model {
    updateScene(e) {
       if (window.croquetModel)
          updateModel(e);
-      else initScene();
+      else {
+         console.log("init scene")
+         window.croquetModel = this;
+         initModel();
+      }
    }
 }
 

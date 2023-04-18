@@ -1,13 +1,22 @@
 import * as croquet from "../util/croquetlib.js";
 
 export let initModel = () => {
-    croquetModel.scene = [1,1,1];
-    
+    if(!croquetModel.scene) croquetModel.scene =  window.clay.model.dataTree;
+    // console.log("init model with", window.clay.model.dataTree)
+    // croquetModel.scene =  window.clay.model.dataTree;
 }
 
 export let updateModel = e => {
-    croquetModel.scene = [Math.random(), Math.random(), Math.random()];
-    console.log(croquetModel.scene)
+    // console.log(e)
+    if(e.what == "release")
+    {
+        window.clay.model.add("cube").move(Math.random(), Math.random(), Math.random()).color(Math.random(), Math.random(), Math.random()).scale(0.5);
+        console.log("update model.dataTree", window.clay.model.dataTree)
+        console.log("update croquetModel scene", croquetModel.scene)
+    }
+    // if(!croquetModel.scene) croquetModel.scene = model.dataTree;
+    // croquetModel.scene.color = [Math.random(), Math.random(), Math.random()];
+    // console.log(croquetModel.scene)
 }
 
 export let drawAvatar = actor => {
@@ -31,8 +40,16 @@ export let drawView    = () => {
 
 export const init = async model => {
     croquet.register('croquetDemo_1.0');
-    let cube = model.add('cube');
+    let cube = model.add('cube').color(1,0,0).scale(0.5);
+    console.log("init model.dataTree", model.dataTree);
+    if(croquetModel) {
+        console.log("init croquetModel.scene", croquetModel.scene)
+    }
     model.move(0,1.5,0).scale(.3).animate(() => {
-       if(croquetModel) cube.identity().scale(.5).color(...croquetModel.scene);
+        // cube.color(1,0,0)
+       if(croquetModel) {
+        // cube.identity().scale(.5).color(...croquetModel.color);
+        // console.log(croquetModel.scene)
+       } 
     });
  }
