@@ -42,12 +42,12 @@ export const init = async model => {
     croquet.register('croquetDemo_1.0');
     let cube = model.add('cube').color(1,0,0).scale(0.5);
     console.log("init model.dataTree", model.dataTree);
-    if(croquetModel) {
+    if(window.croquetModel) {
         console.log("init croquetModel.scene", croquetModel.scene)
     }
     model.move(0,1.5,0).scale(.3).animate(() => {
         // cube.color(1,0,0)
-       if(croquetModel) {
+       if(window.croquetModel) {
         // cube.identity().scale(.5).color(...croquetModel.color);
         // console.log(croquetModel.scene)
        } 

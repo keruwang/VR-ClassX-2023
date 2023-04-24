@@ -131,6 +131,7 @@ export class View extends Croquet.View {
    addPawn(actor) {
       this.pawns.set(actor, new Pawn(actor));
       if(!(actor.viewId in window.avatars)) {
+      //    if(actor.viewId == )
         initAvatar(actor.viewId);
      }
    }

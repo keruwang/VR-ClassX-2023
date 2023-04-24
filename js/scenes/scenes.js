@@ -30,7 +30,7 @@ export default () => {
          { name: "DemoGLTF"           , path: "./demoGLTF.js"           },
          { name: "DemoSprite"         , path: "./demoSprite.js"         },
          { name: "DemoIntersect"      , path: "./demoIntersect.js"      },
-         { name: "DemoCroquet"      , path: "./demoCroquet.js"      },
+         { name: "DemoCroquet"        , path: "./demoCroquet.js"      },
       ]
    };
 }

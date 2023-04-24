@@ -810,8 +810,9 @@ function updateAvatars() {
 
     // update avatar's model's matrix
     for (let id in window.avatars) {
-        if (id == window.playerid) continue;
+        // console.log(id)
         let avatar = window.avatars[id];
+        if (id == window.playerid) avatar.headset.model.visible = false;
         // if (
         //     avatar.headset.position.x ||
         //     avatar.headset.position.y ||
@@ -823,6 +824,7 @@ function updateAvatars() {
             avatar.headset.model.matrix = avatar.headset.matrix;
             avatar.leftController.model.matrix = avatar.leftController.matrix;
             avatar.rightController.model.matrix = avatar.rightController.matrix;
+            avatar.headset.model.visible = false;
             // console.log(id, avatar.headset.position)
         }
     }
