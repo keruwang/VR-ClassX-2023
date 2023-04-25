@@ -1,15 +1,37 @@
 
 // YOUR APPLICATION SHOULD REDEFINE THESE FUNCTIONS:
 
-import {drawAvatar, drawView, initModel, updateModel} from "../scenes/demoCroquet.js";
+import { updateModel } from "../scenes/demoCroquet.js";
 import { controllerMatrix,  buttonState, joyStickState} from "../render/core/controllerInput.js";
 import { initAvatar } from "../primitive/avatar.js";
+import * as global from "../global.js";
 
 // YOU SHOULD OBTAIN YOUR OWN apiKey FROM: croquet.io/keys
 
 let apiKey = '16JKtOOpBuJsmaqgLzMCFyLPg9mqtNhxtObIsoj4b';
+let preLeftTrigger = {pressed: false, touched: false, value: 0};
 
 /////////////////////////////////////////////////////////////////
+let initModel = () => {
+   // if(!croquetModel.scene) croquetModel.scene =  window.clay.model.dataTree;
+}
+
+let drawAvatar = actor => {
+   let avatarInfo = actor.avatarPos;
+   if (avatarInfo.headset) {
+       window.avatars[actor.viewId].headset.matrix = avatarInfo.headset;
+   } 
+       // not in the default pos
+   if (avatarInfo.controllerMatrix) {
+       window.avatars[actor.viewId].leftController.matrix = avatarInfo.controllerMatrix.left;
+       window.avatars[actor.viewId].rightController.matrix = avatarInfo.controllerMatrix.right;
+   }
+}
+
+let drawView    = () => {
+   
+}
+
 
 export class Model extends Croquet.Model {
    init() {
@@ -40,7 +62,6 @@ export class Model extends Croquet.Model {
       this.publish("actor", "exit", actor);
    }
    initScene() {
-    console.log("init scene")
       window.croquetModel = this;
       initModel();
    }
@@ -48,7 +69,6 @@ export class Model extends Croquet.Model {
       if (window.croquetModel)
          updateModel(e);
       else {
-         console.log("init scene")
          window.croquetModel = this;
          initModel();
       }
@@ -103,36 +123,47 @@ export class View extends Croquet.View {
       onmousedown = e => { this.mouseDown(eToXY(e)); }
       onmouseup   = e => { this.mouseUp  (eToXY(e)); }
       onmousemove = e => { this.mouseMove(eToXY(e));
-         this.publish(this.viewId, "updatePos", eToXY(e));
+         // this.publish(this.viewId, "updatePos", eToXY(e));
       }
    }
 
    tick() {    
-    var headMat = [];
-    // if(window.playerid) {
-       // if(this.viewId == window.)
-       for(let j = 0; j < 16; j ++) {
-          headMat.push(window.avatars[window.playerid].headset.matrix[j])
-        }
-        var avatarJson = {
-           "headset": headMat,
-           "controllerMatrix": controllerMatrix,
-           "buttonState": buttonState,
-           "joyStickState": joyStickState,
-           "VR": window.vr,
-        }
-       //  console.log(avatarJson)
-        this.publish(this.viewId, "updatePos", avatarJson);
-       //  this.publish(this.id, "moved", this.now());
-    // }
+      var headMat = [];
+      for(let j = 0; j < 16; j ++) {
+         headMat.push(window.avatars[window.playerid].headset.matrix[j])
+      }
+      var avatarJson = {
+         "headset": headMat,
+         "controllerMatrix": controllerMatrix,
+         "buttonState": buttonState,
+         "joyStickState": joyStickState,
+         "VR": window.vr,
+      }
+      if(preLeftTrigger && !buttonState.right[0].pressed) {
+      this.event('controllerReleased', controllerMatrix.right)
+      }
+      this.publish(this.viewId, "updatePos", avatarJson);
+      preLeftTrigger = buttonState.right[0].pressed;
+
+      window.view = this;
+      drawView();
+      let viewState = this.croquetModel.actorStates.get(this.viewId);
+      for (const pawn of this.pawns.values()) {
+         pawn.update(viewState);
+      }
+
     this.future(50).tick();
  }
 
    addPawn(actor) {
       this.pawns.set(actor, new Pawn(actor));
       if(!(actor.viewId in window.avatars)) {
-      //    if(actor.viewId == )
         initAvatar(actor.viewId);
+     } 
+     else {
+      window.avatars[actor.viewId].headset.model.visible = true;
+      window.avatars[actor.viewId].leftController.model.visible = true;
+      window.avatars[actor.viewId].rightController.model.visible = true;
      }
    }
    removePawn(actor) {
@@ -140,14 +171,22 @@ export class View extends Croquet.View {
       if (pawn) {
          pawn.detach();
          this.pawns.delete(actor);
+         // console.log("delete", actor.viewId);
+         window.avatars[actor.viewId].headset.model.visible = false;
+         window.avatars[actor.viewId].leftController.model.visible = false;
+         window.avatars[actor.viewId].rightController.model.visible = false;
+         // global.scene().removeNode(window.avatars[actor.viewId].headset.model);
+         // global.scene().removeNode(window.avatars[actor.viewId].leftController.model);
+         // global.scene().removeNode(window.avatars[actor.viewId].rightController.model);
       }
    }
    update() {
-      window.view = this;
-      drawView();
-      let viewState = this.croquetModel.actorStates.get(this.viewId);
-      for (const pawn of this.pawns.values())
-         pawn.update(viewState);
+      // window.view = this;
+      // drawView();
+      // let viewState = this.croquetModel.actorStates.get(this.viewId);
+      // for (const pawn of this.pawns.values()) {
+      //    pawn.update(viewState);
+      // }
    }
    initScene  (info) { this.publish("scene", "initScene"  , info); }
    updateScene(info) { this.publish("scene", "updateScene", info); }
@@ -155,7 +194,7 @@ export class View extends Croquet.View {
    event(state, pos) { this.updateScene({who : this.viewId,
                                          what : state,
                                          where : pos}); }
-   mouseDown(p) { this.isDown = true ; console.log("mouse down"); this.event('press', p); }
+   mouseDown(p) { this.isDown = true ; this.event('press', p); }
    mouseMove(p) { this.event(this.isDown ? 'drag' : 'move', p); }
    mouseUp(p)   { this.isDown = false; this.event('release', p); }
 }

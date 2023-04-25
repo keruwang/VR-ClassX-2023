@@ -107,7 +107,7 @@ export class Headset {
     this.model = new Gltf2Node({ url: './media/gltf/headset/headset.gltf' });
     this.model.scale = vec3.fromValues(1, 1, 1);
     this.model.name = "headset";
-    this.model.visible = false;
+    this.model.visible = true;
   }
 }
 
