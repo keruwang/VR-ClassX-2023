@@ -9,8 +9,8 @@ import * as global from "../global.js";
 // YOU SHOULD OBTAIN YOUR OWN apiKey FROM: croquet.io/keys
 
 let apiKey = '16JKtOOpBuJsmaqgLzMCFyLPg9mqtNhxtObIsoj4b';
-let preLeftTrigger = {pressed: false, touched: false, value: 0};
-
+let preRightTrigger = {pressed: false, touched: false, value: 0};
+window.color = [Math.random(), Math.random(), Math.random()]
 /////////////////////////////////////////////////////////////////
 let initModel = () => {
    // if(!croquetModel.scene) croquetModel.scene =  window.clay.model.dataTree;
@@ -106,6 +106,7 @@ export class View extends Croquet.View {
       this.croquetModel = croquetModel;
       this.scene = croquetModel.scene;
       this.state = croquetModel.actorStates.get(this.viewId);
+      this.color = window.color; // assign a unique color to each user for them to create their cubes in demoCroquet
       this.pawns = new Map();
       croquetModel.actors.forEach(actor => this.addPawn(actor));
 
@@ -139,11 +140,11 @@ export class View extends Croquet.View {
          "joyStickState": joyStickState,
          "VR": window.vr,
       }
-      if(preLeftTrigger && !buttonState.right[0].pressed) {
-      this.event('controllerReleased', controllerMatrix.right)
+      if(preRightTrigger && !buttonState.right[0].pressed) {
+      this.event('rightTriggerRelease', controllerMatrix.right, this.color)
       }
       this.publish(this.viewId, "updatePos", avatarJson);
-      preLeftTrigger = buttonState.right[0].pressed;
+      preRightTrigger = buttonState.right[0].pressed;
 
       window.view = this;
       drawView();
@@ -160,7 +161,7 @@ export class View extends Croquet.View {
       if(!(actor.viewId in window.avatars)) {
         initAvatar(actor.viewId);
      } 
-     else {
+     else { // for false stream drop, when the stream is back, change its avatar to visible
       window.avatars[actor.viewId].headset.model.visible = true;
       window.avatars[actor.viewId].leftController.model.visible = true;
       window.avatars[actor.viewId].rightController.model.visible = true;
@@ -171,7 +172,7 @@ export class View extends Croquet.View {
       if (pawn) {
          pawn.detach();
          this.pawns.delete(actor);
-         // console.log("delete", actor.viewId);
+         // currently only change the visibility instead of removing the model directly in case of false stream drop
          window.avatars[actor.viewId].headset.model.visible = false;
          window.avatars[actor.viewId].leftController.model.visible = false;
          window.avatars[actor.viewId].rightController.model.visible = false;
@@ -180,7 +181,7 @@ export class View extends Croquet.View {
          // global.scene().removeNode(window.avatars[actor.viewId].rightController.model);
       }
    }
-   update() {
+   update() { // turns out this function will not be called when entering the VR session, moved the following code to tick function
       // window.view = this;
       // drawView();
       // let viewState = this.croquetModel.actorStates.get(this.viewId);
@@ -191,12 +192,13 @@ export class View extends Croquet.View {
    initScene  (info) { this.publish("scene", "initScene"  , info); }
    updateScene(info) { this.publish("scene", "updateScene", info); }
 
-   event(state, pos) { this.updateScene({who : this.viewId,
+   event(state, pos, info) { this.updateScene({who : this.viewId,
                                          what : state,
-                                         where : pos}); }
+                                         where : pos,
+                                         info: info}); }
    mouseDown(p) { this.isDown = true ; this.event('press', p); }
    mouseMove(p) { this.event(this.isDown ? 'drag' : 'move', p); }
-   mouseUp(p)   { this.isDown = false; this.event('release', p); }
+   mouseUp(p)   { this.isDown = false; this.event('release', p, this.color); }
 }
 
 export class Pawn extends Croquet.View {
